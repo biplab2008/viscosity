@@ -44,18 +44,20 @@ def test(model  : CNN3D, data_loader : DataLoader, criterion : torch.nn.modules.
     y_h_all = []
     y_all =[]
     test_loss = []
-    for (X,y) in data_loader:
-        X = X.to(device)
-        
-        y = y.to(float32) 
-        
-        y_h = model(X)  
-        
-        loss = criterion(y_h.detach().cpu(),y)
-        test_loss.append(loss)
-        
-        y_h_all.extend(y_h.detach().cpu().numpy())
-        y_all.extend(y.numpy())
+    
+    with torch.no_grad():
+        for (X,y) in data_loader:
+            X = X.to(device)
+            
+            y = y.to(float32) 
+            
+            y_h = model(X)  
+            
+            loss = criterion(y_h.detach().cpu(),y)
+            test_loss.append(loss)
+            
+            y_h_all.extend(y_h.detach().cpu().numpy())
+            y_all.extend(y.numpy())
 
     return (np.mean(test_loss), r2_score(np.array(y_all),np.array(y_h_all)))
     
